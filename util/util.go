@@ -22,6 +22,8 @@ import (
 	"sync"
 )
 
+// evalReg 个正则表达式会匹配字符串中的 "eval(...)" 形式的内容，并将括号中的内容捕获为 "rule"。
+// 例如，对于字符串 "eval(rule1)"，这个正则表达式会匹配到整个字符串，并将 "rule1" 捕获为 "rule"。
 var evalReg = regexp.MustCompile(`\beval\((?P<rule>[^)]*)\)`)
 
 var escapeAssertionRegex = regexp.MustCompile(`\b((r|p)[0-9]*)\.`)

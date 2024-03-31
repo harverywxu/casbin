@@ -54,6 +54,9 @@ func loadAssertion(model Model, cfg config.ConfigInterface, sec string, key stri
 	return model.AddDef(sec, key, value)
 }
 
+// (.*?)：这是一个非贪婪的匹配组，它会匹配尽可能少的字符。. 表示任何字符（除了换行符），* 表示零个或多个，? 使得 * 变为非贪婪模式，也就是说它会尽可能少地匹配字符。
+// 这个正则表达式会匹配字符串中的任何在括号中的内容，包括括号本身。例如，对于字符串 "foo(bar)baz"，这个正则表达式会匹配到 "(bar)"
+// 在 Casbin 中，这个正则表达式可能用于从策略规则中提取参数。例如，如果你有一个规则像这样：p(sub, obj, act)，这个正则表达式可以用来提取括号中的 sub, obj, act 部分
 var paramsRegex = regexp.MustCompile(`\((.*?)\)`)
 
 // getParamsToken Get ParamsToken from Assertion.Value.
@@ -79,12 +82,14 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.FieldIndexMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
 
+	// r = sub, obj, act -> tokens: [r_sub, r_obj, r_act]
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
 		for i := range ast.Tokens {
 			ast.Tokens[i] = key + "_" + strings.TrimSpace(ast.Tokens[i])
 		}
 	} else if sec == "g" {
+		// g = _, _ -> ParamsTokens: nil, Tokens: ["_", "_"]
 		ast.ParamsTokens = getParamsToken(ast.Value)
 		ast.Tokens = strings.Split(ast.Value, ",")
 		ast.Tokens = ast.Tokens[:len(ast.Tokens)-len(ast.ParamsTokens)]

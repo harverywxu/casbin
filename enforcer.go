@@ -633,6 +633,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 		}
 	}
 
+	// g(r.sub, p.sub) ...  -> g(r.sub, p.sub) ...
 	var expString string
 	if matcher == "" {
 		expString = e.model["m"][mType].Value
@@ -665,12 +666,16 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	}
 
 	parameters := enforceParameters{
+		// request definition
 		rTokens: rTokens,
-		rVals:   rvals,
+		// request values
+		rVals: rvals,
 
+		// policy definition
 		pTokens: pTokens,
 	}
 
+	// expString, e.g: g(r_sub, p_sub) && r_obj == p_obj && r_act == p_act
 	hasEval := util.HasEval(expString)
 	if hasEval {
 		functions["eval"] = generateEvalFunction(functions, &parameters)
@@ -810,6 +815,7 @@ func (e *Enforcer) enforce(matcher string, explains *[]string, rvals ...interfac
 	return result, nil
 }
 
+// getAndStoreMatcherExpression 解析 expString 语法
 func (e *Enforcer) getAndStoreMatcherExpression(hasEval bool, expString string, functions map[string]govaluate.ExpressionFunction) (*govaluate.EvaluableExpression, error) {
 	var expression *govaluate.EvaluableExpression
 	var err error

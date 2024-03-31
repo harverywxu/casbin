@@ -386,6 +386,7 @@ func GlobMatchFunc(args ...interface{}) (interface{}, error) {
 }
 
 // GenerateGFunction is the factory method of the g(_, _[, _]) function.
+// 判断用户是否属于某角色，并缓存结果
 func GenerateGFunction(rm rbac.RoleManager) govaluate.ExpressionFunction {
 	memorized := sync.Map{}
 	return func(args ...interface{}) (interface{}, error) {
